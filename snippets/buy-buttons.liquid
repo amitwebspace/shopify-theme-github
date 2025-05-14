@@ -1,0 +1,381 @@
+  <style>
+    .form-container {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      background-color: #f9f9f9;
+      transition: border 0.3s ease;
+    }
+
+    .form-group select:focus {
+      border-color: #007BFF;
+      outline: none;
+    }
+
+    /* .submit-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      background-color: #007BFF;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #0056b3;
+    } */
+  </style>
+{% comment %}
+  Renders product buy-buttons.
+  Accepts:
+  - product: {Object} product object.
+  - block: {Object} passing the block information.
+  - product_form_id: {String} product form id.
+  - section_id: {String} id of section to which this snippet belongs.
+  - show_pickup_availability: {Boolean} for the pickup availability. If true the pickup availability is rendered, false - not rendered (optional).
+
+  Usage:
+  {% render 'buy-buttons', block: block, product: product, product_form_id: product_form_id, section_id: section.id, show_pickup_availability: true %}
+{% endcomment %}
+<div {{ block.shopify_attributes }}>
+  {%- if product != blank -%}
+    {%- liquid
+      assign gift_card_recipient_feature_active = false
+      if block.settings.show_gift_card_recipient and product.gift_card?
+        assign gift_card_recipient_feature_active = true
+      endif
+
+      assign show_dynamic_checkout = false
+      if block.settings.show_dynamic_checkout and gift_card_recipient_feature_active == false
+        assign show_dynamic_checkout = true
+      endif
+    -%}
+
+    <product-form
+      class="product-form"
+      data-hide-errors="{{ gift_card_recipient_feature_active }}"
+      data-section-id="{{ section.id }}"
+    >
+      <div class="product-form__error-message-wrapper" role="alert" hidden>
+        <span class="svg-wrapper">
+          {{- 'icon-error.svg' | inline_asset_content -}}
+        </span>
+        <span class="product-form__error-message"></span>
+      </div>
+
+      {%- form 'product',
+        product,
+        id: product_form_id,
+        class: 'form',
+        novalidate: 'novalidate',
+        data-type: 'add-to-cart-form'
+      -%}
+
+{% comment %}
+<!-- Style -->
+<label for="style">Style</label>
+<select id="style" required>
+  <option value="">Select Style</option>
+  <option value="Flat Fold Style With Back Slats">Flat Fold Style With Back Slats</option>
+  <option value="Plain Fold Style With Front Slats">Plain Fold Style With Front Slats</option>
+  <option value="European / Relaxed Style">European / Relaxed Style</option>
+</select>
+
+<!-- Mount -->
+<label for="mount">Mount</label>
+<select id="mount" required>
+  <option value="">Select Mount</option>
+  <option value="Inside Mount">Inside Mount</option>
+  <option value="Outside Mount">Outside Mount</option>
+</select>
+
+<!-- Length -->
+<label for="length">Length (cm)</label>
+<input type="number" id="length" min="0" max="275" required>
+
+<!-- Width -->
+<label for="width">Width (cm)</label>
+<input type="number" id="width" min="0" max="275" required>
+
+<!-- Lining -->
+<label for="lining">Lining</label>
+<select id="lining" required>
+  <option value="">Select Lining</option>
+  <option value="Privacy Lining">Privacy Lining</option>
+  <option value="Blackout Lining">Blackout Lining</option>
+  <option value="No Lining">No Lining</option>
+</select>
+
+<!-- Div to Show Selected Values -->
+<div id="selected-values">
+  <p id="style-show"></p>
+  <p id="mount-show"></p>
+  <p id="length-show"></p>
+  <p id="width-show"></p>
+  <p id="lining-show"></p>
+</div>
+
+
+<!-- jQuery Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  function checkAllFields() {
+    // Get values of all fields
+    let style = $('#style').val();
+    let mount = $('#mount').val();
+    let length = $('#length').val();
+    let width = $('#width').val();
+    let lining = $('#lining').val();
+
+    // Show selected values in the 'selected-values' div
+    $('#style-show').text('Style: ' + (style || 'Please select'));
+    $('#mount-show').text('Mount: ' + (mount || 'Please select'));
+    $('#length-show').text('Length: ' + (length || 'Please enter length'));
+    $('#width-show').text('Width: ' + (width || 'Please enter width'));
+    $('#lining-show').text('Lining: ' + (lining || 'Please select'));
+
+    // Enable button only if all fields are filled
+    if (style && mount && length && width && lining) {
+      $('.main-class-product-add-to-cart').prop('disabled', false);
+    } else {
+      $('.main-class-product-add-to-cart').prop('disabled', true);
+    }
+  }
+
+  $(document).ready(function () {
+    // Bind input and change events to check values when changed
+    $('#style, #mount, #length, #width, #lining').on('input change', function () {
+      checkAllFields();
+    });
+
+    // Initial check on page load
+    checkAllFields();
+  });
+</script>
+{% endcomment %}
+
+ <div class="form-container">
+    <h2>Customize Your Valance</h2>
+
+    <div class="form-group line-item-property__field">
+      <label for="style">VALANCE WIDTH (CMS)</label>
+      <select id="style" name="properties[Style]"required>
+        <option value="">Select VALANCE WIDTH</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+
+<div class="form-group line-item-property__field">
+  <label>Your name</label><br>
+  <input type="radio" name="properties[Your name]" value="Inside Mount"><img src="https://cdn.shopify.com/s/files/1/0628/7704/0828/files/mount1.png?v=1746700233" width="100" height="100"> <span>Inside Mount</span><br>
+  <input type="radio" name="properties[Your name]" value="Outside Mount"><img src="https://cdn.shopify.com/s/files/1/0628/7704/0828/files/mount2.png?v=1746700233" width="100" height="100"> <span>Outside Mount</span><br>
+</div>
+
+    <div class="form-group line-item-property__field">
+      <label for="length">VALANCE LENGTH/DROP (CMS)</label>
+      <select id="length" name="properties[Length]" required>
+        <option value="">Select VALANCE LENGTH/DROP</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+
+    <div class="form-group line-item-property__field">
+      <label for="fabric">Fabric</label>
+      <select id="fabric" name="properties[Fabric]" required>
+        
+        <option value="">Select Fabric</option>
+        <option value="Abalone Sea">Abalone Sea</option>
+        <option value="Absicon">Absicon</option>
+        <option value="Abstract Sky">Abstract Sky</option>
+        <option value="Abstrakte">Abstrakte</option>
+      </select>
+    </div>
+
+    <!-- <button class="submit-btn">Submit</button> -->
+<!-- Div to Show Selected Values -->
+<div id="selected-values">
+  <p id="style-show"></p>
+  <p id="length-show"></p>
+  <p id="fabric-show"></p>
+</div>
+        
+  </div>
+
+  <!-- jQuery Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  function checkAllFields() {
+    // Get values of all fields
+    let style = $('#style').val();
+    let length = $('#length').val();
+    let fabric = $('#fabric').val();
+
+    // Show selected values in the 'selected-values' div
+    $('#style-show').text('Style: ' + (style || 'Please select'));
+    $('#length-show').text('Length: ' + (length || 'Please select'));
+    $('#fabric-show').text('Fabric: ' + (fabric || 'Please select'));
+
+    // Enable button only if all fields are filled
+    if (style && length && fabric) {
+      $('.main-class-product-add-to-cart').prop('disabled', false);
+    } else {
+      $('.main-class-product-add-to-cart').prop('disabled', true);
+    }
+  }
+
+  $(document).ready(function () {
+    // Bind input and change events to check values when changed
+    $('#style, #length, #fabric').on('input change', function () {
+      checkAllFields();
+    });
+
+    // Initial check on page load
+    checkAllFields();
+  });
+</script>
+
+        
+        <input
+          type="hidden"
+          name="id"
+          value="{{ product.selected_or_first_available_variant.id }}"
+          {% if product.selected_or_first_available_variant.available == false
+            or quantity_rule_soldout
+            or product.selected_or_first_available_variant == null
+          %}
+            disabled
+          {% endif %}
+          class="product-variant-id"
+        >
+
+        {%- if gift_card_recipient_feature_active -%}
+          {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
+        {%- endif -%}
+
+        <div class="product-form__buttons">
+          {%- liquid
+            assign check_against_inventory = true
+            if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
+              assign check_against_inventory = false
+            endif
+            if product.selected_or_first_available_variant.quantity_rule.min > product.selected_or_first_available_variant.inventory_quantity and check_against_inventory
+              assign quantity_rule_soldout = true
+            endif
+          -%}
+          <button
+            id="ProductSubmitButton-{{ section_id }}"
+            type="submit"
+            name="add"
+            class="main-class-product-add-to-cart product-form__submit button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
+            {% if product.selected_or_first_available_variant.available == false
+              or quantity_rule_soldout
+              or product.selected_or_first_available_variant == null
+            %}
+              disabled
+            {% endif %}
+          >
+            <span>
+              {%- if product.selected_or_first_available_variant == null -%}
+                {{ 'products.product.unavailable' | t }}
+              {%- elsif product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- else -%}
+                {{ 'products.product.add_to_cart' | t }}
+              {%- endif -%}
+            </span>
+            {%- render 'loading-spinner' -%}
+          </button>
+          {%- if show_dynamic_checkout -%}
+            {{ form | payment_button }}
+          {%- endif -%}
+        </div>
+      {%- endform -%}
+    </product-form>
+  {%- else -%}
+    <div class="product-form">
+      <div class="product-form__buttons form">
+        <button
+          type="submit"
+          name="add"
+          class="product-form__submit button button--full-width button--primary"
+          disabled
+        >
+          {{ 'products.product.sold_out' | t }}
+        </button>
+      </div>
+    </div>
+  {%- endif -%}
+
+  {%- if show_pickup_availability -%}
+    {{ 'component-pickup-availability.css' | asset_url | stylesheet_tag }}
+
+    {%- assign pick_up_availabilities = product.selected_or_first_available_variant.store_availabilities
+      | where: 'pick_up_enabled', true
+    -%}
+
+    <pickup-availability
+      class="product__pickup-availabilities quick-add-hidden"
+      {% if product.selected_or_first_available_variant.available and pick_up_availabilities.size > 0 %}
+        available
+      {% endif %}
+      data-root-url="{{ routes.root_url }}"
+      data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+      data-has-only-default-variant="{{ product.has_only_default_variant }}"
+      data-product-page-color-scheme="gradient color-{{ section.settings.color_scheme }}"
+    >
+      <template>
+        <pickup-availability-preview class="pickup-availability-preview">
+          <span class="svg-wrapper">
+            {{- 'icon-unavailable.svg' | inline_asset_content -}}
+          </span>
+          <div class="pickup-availability-info">
+            <p class="caption-large">{{ 'products.product.pickup_availability.unavailable' | t }}</p>
+            <button class="pickup-availability-button link link--text underlined-link">
+              {{ 'products.product.pickup_availability.refresh' | t }}
+            </button>
+          </div>
+        </pickup-availability-preview>
+      </template>
+    </pickup-availability>
+
+    <script src="{{ 'pickup-availability.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
+</div>
